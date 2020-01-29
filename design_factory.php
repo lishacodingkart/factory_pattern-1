@@ -8,23 +8,23 @@
  * Version: 1.0.1
    */
  
-
 class FactoryDesign{
 public function __construct(){     
-           add_action( 'wp_enqueue_scripts', array($this,'add_factory_scripts' ));                
+    //****************** enque Script file *******************//
+           add_action( 'wp_enqueue_scripts', array($this,'loadJs' ));     
+   
+    //****************** Load main method  *******************//
            add_action('wp_ajax_factroyData', array($this,'factroyData'));
            add_action('wp_ajax_nopriv_factroyData', array($this,'factroyData'));
-
  } 
- public  function add_factory_scripts() {       
-        
+ public  function loadJs() {       
     wp_enqueue_script( 'my_loadmore',  plugins_url(). '/design_pattern/designPattern.js', array( 'jquery' ));
      wp_localize_script( 'my_loadmore', 'ajax_object', array( 'ajaxurl' =>admin_url( 'admin-ajax.php' ) ) );
          wp_enqueue_script( 'factory_script');
          // wp_localize_script( 'factory_script', 'ajax_admin', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
  }
 
-                     
+     //****************** Main responsible for get data from front end *******************//              
  public function factroyData(){
         $html="";
         $html.="<table>";       
@@ -37,7 +37,7 @@ public function __construct(){
         {       
         $oderDetails->cost = "12000";
         $oderDetails->totaltime = "2 Day";
-
+// function create with perameter is used for helping subclass for object creation  
         $order = $BaseTransport->create("Sea", $oderDetails);
         $html.="<tr><th>Transport by Sea</th></tr>";
         }
@@ -65,11 +65,13 @@ interface Transport{
      public function materialquantity();
      public function totaltime();
 }
+// Super class for common global variables 
 class FactoryMain{
     public $cost;
     public $totaltime;
     public $materialquantity;
 }
+// here we can implement as many subclasses we want, just need to implement interface
 class Road implements Transport{
     private $make;
     public function __construct(FactoryMain $oderDetails) {
@@ -102,6 +104,7 @@ class Sea implements Transport{
     }
 }
 
+// base class used for decision making,  that which class object should created
 class BaseTransport{
     public function create($class, $make)
     {
